@@ -122,6 +122,10 @@ module.exports = function main() {
       mainWindow.setMenuBarVisibility(!autoHideMenuBar);
     });
 
+    ipcMain.on('wpLogin', function (event, url) {
+      shell.openExternal(url);
+    });
+
     mainWindowState.manage(mainWindow);
 
     mainWindow.webContents.on('new-window', function (event, linkUrl) {

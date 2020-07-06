@@ -6,7 +6,6 @@ import getConfig from '../../get-config';
 import SimplenoteLogo from '../icons/simplenote';
 import Spinner from '../components/spinner';
 import { validatePassword } from '../utils/validate-password';
-import { getIpcRenderer } from '../utils/electron';
 import { isElectron, isMac } from '../utils/platform';
 import { viewExternalUrl } from '../utils/url-utils';
 
@@ -341,11 +340,10 @@ export class Auth extends Component<Props> {
     const redirectUrl = encodeURIComponent(config.wpcc_redirect_url);
     this.authState = `app-${cryptoRandomString(20)}`;
     const authUrl = `https://public-api.wordpress.com/oauth2/authorize?client_id=${config.wpcc_client_id}&redirect_uri=${redirectUrl}&response_type=code&scope=global&state=${this.authState}`;
-    const shell = __non_webpack_require__('electron').shell;
-    shell.openExternal(authUrl);
 
-    const ipc = getIpcRenderer();
-    ipc.on('wpLogin', (event, url) => {
+    window.electron.send('wpLogin', authUrl);
+
+    window.electron.receive('wpLogin', (url) => {
       const { searchParams } = new URL(url);
 
       const errorCode = searchParams.get('error')
